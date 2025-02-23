@@ -17,83 +17,80 @@ app.use((req, res, next) => {
 
 // Route to display all tasks
 app.get("/", (req, res) => {
-    fs.readFile("tasks.json", "utf8", (err, data) => {
-        if (err) {
-            return res.status(500).send("Error reading tasks file.");
-        }
-        const tasks = JSON.parse(data);
-        res.render("index", { tasks }); // Render tasks on the page
-    });
+  fs.readFile("tasks.json", "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).send("Error reading tasks file.");
+    }
+    const tasks = JSON.parse(data);
+    res.render("index", { tasks }); // Render tasks on the page
+  });
 });
 
 // Route to get a specific task by ID
 app.get("/task", (req, res) => {
-    const taskId = parseInt(req.query.id); // Get task ID from query parameter
+  const taskId = parseInt(req.query.id); // Get task ID from query parameter
 
-    fs.readFile("tasks.json", "utf8", (err, data) => {
-        if (err) {
-            return res.status(500).send("Error reading tasks file.");
-        }
-        const tasks = JSON.parse(data);
-        const task = tasks.find(t => t.id === taskId);
+  fs.readFile("tasks.json", "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).send("Error reading tasks file.");
+    }
+    const tasks = JSON.parse(data);
+    const task = tasks.find((t) => t.id === taskId);
 
-        if (!task) {
-            return res.status(404).send("Task not found.");
-        }
-        res.json(task);
-    });
+    if (!task) {
+      return res.status(404).send("Task not found.");
+    }
+    res.json(task);
+  });
 });
-
 
 // Route to add a new task
 app.post("/add-task", (req, res) => {
-    const newTask = {
-        id: Date.now(), // Generate a unique ID
-        task: req.body.task
-    };
+  const newTask = {
+    task: req.body.task,
+  };
 
-    fs.readFile("tasks.json", "utf8", (err, data) => {
-        if (err) {
-            return res.status(500).send("Error reading tasks file.");
-        }
-        const tasks = JSON.parse(data);
-        tasks.push(newTask);
+  fs.readFile("tasks.json", "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).send("Error reading tasks file.");
+    }
+    const tasks = JSON.parse(data);
+    tasks.push({...newTask, id:tasks.length+1});
 
-        fs.writeFile("tasks.json", JSON.stringify(tasks, null, 2), (err) => {
-            if (err) {
-                return res.status(500).send("Error saving task.");
-            }
-            res.redirect("/"); // Redirect back to homepage
-        });
+    fs.writeFile("tasks.json", JSON.stringify(tasks, null, 2), (err) => {
+      if (err) {
+        return res.status(500).send("Error saving task.");
+      }
+      res.redirect("/"); // Redirect back to homepage
     });
+  });
 });
 
 // Route to update task completion status
 app.post("/update-task", (req, res) => {
-    const taskId = parseInt(req.body.id);
+  const taskId = parseInt(req.body.id);
 
-    fs.readFile("tasks.json", "utf8", (err, data) => {
-        if (err) {
-            return res.status(500).send("Error reading tasks file.");
-        }
-        let tasks = JSON.parse(data);
+  fs.readFile("tasks.json", "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).send("Error reading tasks file.");
+    }
+    let tasks = JSON.parse(data);
 
-        tasks = tasks.map(task => {
-            if (task.id === taskId) {
-                task.completed = req.body.completed ? true : false;
-            }
-            return task;
-        });
-
-        fs.writeFile("tasks.json", JSON.stringify(tasks, null, 2), (err) => {
-            if (err) {
-                return res.status(500).send("Error updating task.");
-            }
-            res.redirect("/");
-        });
+    tasks = tasks.map((task) => {
+      if (task.id === taskId) {
+        task.completed = req.body.completed ? true : false;
+      }
+      return task;
     });
-});
 
+    fs.writeFile("tasks.json", JSON.stringify(tasks, null, 2), (err) => {
+      if (err) {
+        return res.status(500).send("Error updating task.");
+      }
+      res.redirect("/");
+    });
+  });
+});
 
 // Start server
 app.listen(PORT, () => {

@@ -1,16 +1,12 @@
 [
   {
+    "task": "study",
     "id": 1,
-    "task": "Learn Node.js",
-    "completed": true
+    "completed": false
   },
   {
-    "id": 1740326151939,
     "task": "bring fruits",
+    "id": 2,
     "completed": true
-  },
-  {
-    "id": 1740326634604,
-    "task": "study"
   }
 ]
